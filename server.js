@@ -16,6 +16,7 @@ require('dotenv').config();  // Load environment variables
 const jwtSecret = process.env.JWT_SECRET;  // Get the secret from .env
 
 app.use(express.json()); // Handle JSON parsing
+app.use(express.static('frontend/Sharesphere-frontend'));
 
 app.use('/api/users', userRoutes); // Set up the user routes
 
