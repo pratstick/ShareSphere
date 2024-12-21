@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const cors = require('cors');
+const dotenv = require('dotenv');
 
 // Initialize the app first
 const app = express();
