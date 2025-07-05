@@ -1,200 +1,169 @@
-# ShareSphere - Neighborhood Help Platform
+# ShareSphere
 
-A modern, community-driven neighborhood help platform built with Next.js 15, Sanity CMS, Clerk, and AI content moderation. Connect with your neighbors to offer and request help, building stronger communities through mutual support.
+A web application that helps neighbors connect and support each other. Built with Next.js 15, Sanity CMS, and Clerk authentication.
+
+## What is this?
+
+ShareSphere lets people in the same neighborhood help each other out. Need someone to walk your dog? Looking for a math tutor for your kid? Want to offer grocery pickup for elderly neighbors? This platform makes it easy to ask for help or offer your services to people nearby.
 
 ## Features
 
-### For Community Members
+**For people who need help:**
+- Post requests for things like school pickup, grocery runs, pet sitting
+- Browse available helpers in your area
+- Add photos and details to your requests
+- Filter by category (childcare, transportation, tech help, etc.)
 
-- 🏠 Browse help offers and requests from your neighborhood
-- 🤝 Offer help to neighbors in need (services, transport, tutoring, etc.)
-- 🙏 Request assistance from your community
-- 🔍 Search for specific types of help or services
-- 📝 Create detailed help posts with rich descriptions
-- 📊 Support community members through upvoting and engagement
-- 💬 Connect through comments and discussions
-- 🖼️ Share images to better illustrate your help offers or needs
-- 👤 Build your community reputation through helpful contributions
+**For people who want to help:**
+- See what neighbors need assistance with
+- Offer your skills and services
+- Build a reputation in your community
+- Set your availability and preferences
 
-### For Neighborhoods
+**Community tools:**
+- Each neighborhood has its own space
+- Comment and discuss on posts
+- Report inappropriate content
+- User profiles showing help history
 
-- 🌐 Create and manage neighborhood communities
-- 📋 Neighborhood-specific help feeds
-- 🏘️ Build stronger local connections
-- 🚫 Report inappropriate content to maintain community standards
+**Behind the scenes:**
+- AI content moderation keeps things safe
+- Mobile-friendly design
+- Real-time updates when new posts are added
 
-### AI Features
+## Tech Stack
 
-- 🤖 AI-powered content moderation for safe communities
-- 🛡️ Automatic detection and filtering of inappropriate content
-- 🚩 Community reporting system for policy violations
-- 🔍 Smart content analysis to maintain neighborhood safety standards
-- 🤝 AI assistance in categorizing help offers and requests
-
-### Technical Features
-
-- 🚀 Server Components & Server Actions with Next.js 15
-- 👤 Authentication with Clerk
-- 📝 Content management with Sanity.io
-- 🎨 Modern UI with Tailwind CSS and Radix UI
-- 📱 Responsive design
-- 🔄 Real-time content updates
-- 🔒 Protected routes and content
-- ⚡ Turbopack for fast development
-
-### UI/UX Features
-
-- 🎯 Clean, intuitive neighborhood-focused interface
-- 🎨 Consistent design system using Radix UI components
-- ♿ Accessible components for all community members
-- 📱 Responsive design for desktop and mobile usage
-- ⏱️ Time-ago timestamps for help posts and responses
-- 🔍 Smart search for finding specific types of assistance
-- 💫 Smooth interactions to enhance user experience
-- 🏷️ Clear "Offer Help" and "Request Help" categorization
-- 🎨 Visual badges to distinguish help types at a glance
+- **Frontend:** Next.js 15, TypeScript, Tailwind CSS
+- **Database/CMS:** Sanity
+- **Authentication:** Clerk  
+- **AI Moderation:** OpenAI API
+- **Deployment:** Vercel
 
 ## Getting Started
 
-### Prerequisites
+You'll need accounts with Clerk (for user auth) and Sanity (for data storage). OpenAI API key is optional but recommended for content moderation.
 
-- Node.js 18+
-- npm, yarn, or pnpm
-- Clerk Account
-- Sanity Account
-- OpenAI API key (for AI moderation)
+### Quick Setup
+
+1. Clone this repo
+   ```bash
+   git clone https://github.com/pratstick/ShareSphere.git
+   cd ShareSphere
+   ```
+
+2. Install dependencies
+   ```bash
+   pnpm install
+   ```
+
+3. Copy `.env.example` to `.env.local` and fill in your API keys
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. Set up Sanity (see below for details)
+
+5. Start the development server
+   ```bash
+   pnpm dev
+   ```
+
+6. Open http://localhost:3000
+
+### Sanity CMS Setup
+
+1. Create a new project at [sanity.io](https://sanity.io)
+
+2. Install Sanity CLI
+   ```bash
+   npm install -g @sanity/cli
+   ```
+
+3. Login to Sanity
+   ```bash
+   sanity login
+   ```
+
+4. Get your project details from the Sanity dashboard and add them to `.env.local`:
+   ```bash
+   NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id
+   NEXT_PUBLIC_SANITY_DATASET=production
+   ```
+
+5. Create API tokens in your Sanity dashboard:
+   - Go to API settings in your Sanity project
+   - Create a token with "Viewer" permissions for `SANITY_API_TOKEN`
+   - Create a token with "Editor" permissions for `SANITY_API_ADMIN_TOKEN`
+
+6. Deploy your Sanity Studio
+   ```bash
+   sanity deploy
+   ```
+
+7. Your Sanity Studio will be available at `https://your-project-name.sanity.studio`
+
+### Clerk Authentication Setup
+
+1. Create an account at [clerk.com](https://clerk.com)
+2. Create a new application
+3. Copy your keys to `.env.local`:
+   ```bash
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-key
+   CLERK_SECRET_KEY=your-secret
+   ```
+4. In Clerk dashboard, add your development URL (`http://localhost:3000`) to allowed origins
 
 ### Environment Variables
 
-Create a `.env.local` file with:
+Your `.env.local` should look like this:
 
 ```bash
 # Sanity
 NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id
 NEXT_PUBLIC_SANITY_DATASET=production
-SANITY_API_TOKEN=your-sanity-read-token
+SANITY_API_TOKEN=your-viewer-token
+SANITY_API_ADMIN_TOKEN=your-editor-token
 
 # Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-key
+CLERK_SECRET_KEY=your-clerk-secret
 
-# OpenAI (for AI moderation)
-OPENAI_API_KEY=your-openai-api-key
+# OpenAI (optional)
+OPENAI_API_KEY=your-openai-key
 
-# Sanity Admin Token 
-SANITY_API_ADMIN_TOKEN=your-sanity-admin-token
+# Base URL
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/pratstick/ShareSphere.git
-cd ShareSphere
-
-# Install dependencies using pnpm
-pnpm install
-
-# Start the development server with Turbopack
-pnpm dev
-
-# Visit http://localhost:3000 to see ShareSphere in action
-```
-
-### Setting up Sanity CMS
-
-1. Create a Sanity account
-2. Create a new project for ShareSphere
-3. Install the Sanity CLI:
-   ```bash
-   npm install -g @sanity/cli
-   ```
-4. Initialize Sanity in your project:
-   ```bash
-   sanity init
-   ```
-5. Deploy Sanity Studio:
-   ```bash
-   sanity deploy
-   ```
-6. Create an admin token:
-   - Go to your Sanity project dashboard
-   - Navigate to API settings
-   - Create a token with "Editor" permissions
-   - Add it to your `.env.local` as `SANITY_API_ADMIN_TOKEN`
-
-### Setting up Clerk Authentication
-
-1. Create a Clerk application for ShareSphere
-2. Configure authentication providers (email, social, etc.)
-3. Set up redirect URLs for your domain
-4. Add the environment variables to your `.env.local`
-5. Customize sign-in/sign-up flows for neighborhood context
-
-### Core Technologies
-
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Sanity CMS** - Headless content management
-- **Clerk Auth** - User authentication and management
-- **OpenAI API** - AI-powered content moderation
-- **Tailwind CSS** - Utility-first styling
-- **Radix UI** - Accessible component primitives
-- **Lucide Icons** - Beautiful, consistent iconography
 
 ## Project Structure
 
 ```
-ShareSphere/
-├── app/                    # Next.js app directory
-│   ├── (app)/             # Main application routes
-│   │   ├── page.tsx       # Homepage with all neighborhood posts
-│   │   ├── neighborhood/  # Neighborhood-specific pages
-│   │   ├── create-post/   # Help post creation
-│   │   └── search/        # Search functionality
-│   ├── (admin)/           # Admin routes
-│   └── api/               # API routes
-├── components/            # Reusable React components
-│   ├── header/           # Navigation and branding
-│   ├── post/             # Help post components
-│   ├── comment/          # Comment system
-│   └── ui/               # UI primitives
-├── scripts/              # Utility scripts
-├── sanity/               # Sanity CMS configuration
-│   ├── schemaTypes/      # Content schemas
-│   └── lib/              # Sanity client utilities
-└── action/               # Server actions
+app/                 # Next.js pages and API routes
+├── (app)/          # Main app pages  
+├── (admin)/        # Admin tools
+└── api/            # API endpoints
+
+components/         # React components
+├── post/          # Post creation, display
+├── comment/       # Comment system
+├── header/        # Navigation
+└── ui/            # Buttons, forms, etc.
+
+sanity/            # Database schema and queries
+action/            # Server actions (create post, vote, etc.)
 ```
 
 ## Contributing
 
-We welcome contributions to make ShareSphere even better! Here are ways you can help:
+Open to contributions! Check out the Issues tab for things that need work. 
 
-- 🐛 **Bug Reports**: Found an issue? Create a detailed bug report
-- 💡 **Feature Requests**: Have an idea for improving neighborhood connections?
-- 🔧 **Code Contributions**: Submit pull requests for bug fixes or new features
-- 📖 **Documentation**: Help improve our docs and guides
-- 🌍 **Localization**: Help translate ShareSphere for global communities
-
-### Development Guidelines
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Areas where help would be appreciated:
+- Mobile app development
+- Performance improvements  
+- Better search and filtering
+- Accessibility improvements
+- New feature ideas
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Acknowledgments
-
-- Built with inspiration from successful community platforms
-- Thanks to the Next.js, Sanity, and Clerk teams for excellent tools
-
----
-
-**ShareSphere** - Building stronger neighborhoods through technology 🏘️❤️
-
-Built with ❤️ using Next.js, Sanity, Clerk, and OpenAI
+MIT License - see LICENSE file.
