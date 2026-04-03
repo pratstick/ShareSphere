@@ -9,7 +9,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
   return (
     <>
       {/* Hero Banner */}
-      <section className="bg-gradient-to-r from-blue-950/60 to-orange-950/60 dark:from-blue-950/80 dark:to-orange-950/60 border-b border-border">
+      <section className="bg-gradient-to-r from-blue-950/70 to-orange-950/60 border-b border-border">
         <div className="mx-auto max-w-7xl px-4 py-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground mb-4">
