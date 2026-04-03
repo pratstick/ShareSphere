@@ -15,7 +15,7 @@ import PostVoteButtons from "./PostVoteButtons";
 import ReportButton from "../ReportButton";
 import DeleteButton from "../DeleteButton";
 import { PortableText } from "@portabletext/react";
-import type { PortableTextBlock } from "@portabletext/types";
+import type { PortableTextBlock } from "@portabletext/react";
 
 interface PostProps {
   post:

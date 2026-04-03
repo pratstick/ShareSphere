@@ -17,11 +17,10 @@ export async function createSubreddit(
 ) {
   try {
     // Validate and sanitize slug before any DB operations
-    const rawSlug = customSlug || name.toLowerCase().replace(/\s+/g, "-");
-    if (!SLUG_REGEX.test(rawSlug)) {
+    const slug = customSlug || name.toLowerCase().replace(/\s+/g, "-");
+    if (!SLUG_REGEX.test(slug)) {
       return { error: "URL slug may only contain lowercase letters, numbers, and hyphens" };
     }
-    const slug = rawSlug;
 
     // Check if subreddit with this name already exists
     const checkExistingQuery = defineQuery(`

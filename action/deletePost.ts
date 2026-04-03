@@ -4,6 +4,14 @@ import { adminClient } from "@/sanity/lib/adminClient";
 import { getPostById } from "@/sanity/lib/post/getPostById";
 import { currentUser } from "@clerk/nextjs/server";
 
+const makeDeletedBody = () => [
+  {
+    _type: "block",
+    _key: crypto.randomUUID(),
+    children: [{ _type: "span", _key: crypto.randomUUID(), text: "[DELETED CONTENTS]" }],
+  },
+];
+
 export const deletePost = async (postId: string) => {
   const user = await currentUser();
   if (!user) {
@@ -31,7 +39,7 @@ export const deletePost = async (postId: string) => {
       isDeleted: true,
       image: null,
       title: "[DELETED POST]",
-      body: [{ _type: "block", _key: crypto.randomUUID(), children: [{ _type: "span", _key: crypto.randomUUID(), text: "[DELETED CONTENTS]" }] }],
+      body: makeDeletedBody(),
     })
   );
 

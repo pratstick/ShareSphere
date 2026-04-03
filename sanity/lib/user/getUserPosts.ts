@@ -1,8 +1,9 @@
-import { adminClient } from "../adminClient";
+import { sanityFetch } from "../live";
+import { defineQuery } from "groq";
 
 export async function getUserPosts(userId: string) {
   try {
-    const posts = await adminClient.fetch(
+    const getUserPostsQuery = defineQuery(
       `*[_type == "post" && author._ref == $userId && !isDeleted] | order(publishedAt desc) {
         _id,
         _type,
@@ -17,7 +18,7 @@ export async function getUserPosts(userId: string) {
         category,
         publishedAt,
         isDeleted,
-        author->{
+        "author": author->{
           _id,
           _type,
           _createdAt,
@@ -30,7 +31,7 @@ export async function getUserPosts(userId: string) {
           image,
           isReported
         },
-        subreddit->{
+        "subreddit": subreddit->{
           _id,
           _type,
           _createdAt,
@@ -41,13 +42,14 @@ export async function getUserPosts(userId: string) {
           description
         },
         image,
-        "upvotes": count(*[_type == "vote" && post._ref == ^._id && type == "upvote"]),
-        "downvotes": count(*[_type == "vote" && post._ref == ^._id && type == "downvote"]),
+        "upvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "upvote"]),
+        "downvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "downvote"]),
         "commentCount": count(*[_type == "comment" && post._ref == ^._id])
-      }`,
-      { userId }
+      }`
     );
-    return posts || [];
+
+    const result = await sanityFetch({ query: getUserPostsQuery, params: { userId } });
+    return result.data || [];
   } catch (error) {
     console.error("Error fetching user posts:", error);
     return [];

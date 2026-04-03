@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
+      clerk:
+        patterns:
+          - "@clerk/*"
+      sanity:
+        patterns:
+          - "sanity"
+          - "next-sanity"
+          - "@sanity/*"
+      ai-sdk:
+        patterns:
+          - "ai"
+          - "@ai-sdk/*"
+      next:
+        patterns:
+          - "next"
+          - "eslint-config-next"
