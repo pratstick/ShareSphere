@@ -4,6 +4,14 @@ import { adminClient } from "@/sanity/lib/adminClient";
 import { getPostById } from "@/sanity/lib/post/getPostById";
 import { currentUser } from "@clerk/nextjs/server";
 
+const makeDeletedBody = () => [
+  {
+    _type: "block",
+    _key: crypto.randomUUID(),
+    children: [{ _type: "span", _key: crypto.randomUUID(), text: "[DELETED CONTENTS]" }],
+  },
+];
+
 export const deletePost = async (postId: string) => {
   const user = await currentUser();
   if (!user) {
@@ -15,44 +23,31 @@ export const deletePost = async (postId: string) => {
     return { error: "Post not found" };
   }
 
-  console.log(post);
-  console.log(post.author?._id, user?.id);
-
   if (post.author?._id !== user?.id) {
     return { error: "You are not authorized to delete this post" };
   }
 
-  const patch = adminClient.patch(postId);
+  const imageRef = post.image?.asset?._ref;
 
-  // Delete image from post
-  if (post.image?.asset?._ref) {
-    patch.set({ image: null });
+  // Build an atomic transaction: mark post as deleted and (if present)
+  // delete the image asset in a single round-trip so there is no window
+  // where the post is gone but the asset still exists, or vice-versa.
+  const transaction = adminClient.transaction();
+
+  transaction.patch(postId, (patch) =>
+    patch.set({
+      isDeleted: true,
+      image: null,
+      title: "[DELETED POST]",
+      body: makeDeletedBody(),
+    })
+  );
+
+  if (imageRef) {
+    transaction.delete(imageRef);
   }
 
-  // Set post to deleted
-  patch.set({ isDeleted: true });
+  await transaction.commit();
 
-  // Set body to null
-  patch.set({
-    body: [{ children: [{ text: "[DELETED CONTENTS]" }], type: "paragraph" }],
-  });
-
-  // Set title to null
-  patch.set({ title: "[DELETED POST]" });
-
-  // Commit changes
-  const result = await patch.commit();
-
-  if (result) {
-    // Delete image from post
-    // wait for 1 second
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Deleting image from post");
-    if (post.image?.asset?._ref) {
-      await adminClient.delete(post.image.asset._ref);
-    }
-  }
-
-  // Return success message
   return { success: "Post deleted successfully" };
 };

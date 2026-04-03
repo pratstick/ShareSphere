@@ -1,12 +1,14 @@
-import { adminClient } from "../adminClient";
+import { sanityFetch } from "../live";
+import { defineQuery } from "groq";
 
 export async function getUserByUsername(username: string) {
   try {
-    const user = await adminClient.fetch(
-      `*[_type == "user" && username == $username][0]`,
-      { username }
+    const getUserByUsernameQuery = defineQuery(
+      `*[_type == "user" && username == $username][0]`
     );
-    return user;
+
+    const result = await sanityFetch({ query: getUserByUsernameQuery, params: { username } });
+    return result.data ?? null;
   } catch (error) {
     console.error("Error fetching user by username:", error);
     return null;

@@ -4,6 +4,10 @@ import { sanityFetch } from "../live";
 import { adminClient } from "../adminClient";
 import { Subreddit } from "@/sanity.types";
 
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+const SLUG_REGEX = /^[a-z0-9-]+$/;
+
 export async function createSubreddit(
   name: string,
   moderatorId: string,
@@ -11,9 +15,13 @@ export async function createSubreddit(
   customSlug?: string,
   customDescription?: string
 ) {
-  console.log(`Creating subreddit: ${name} with moderator: ${moderatorId}`);
-
   try {
+    // Validate and sanitize slug before any DB operations
+    const slug = customSlug || name.toLowerCase().replace(/\s+/g, "-");
+    if (!SLUG_REGEX.test(slug)) {
+      return { error: "URL slug may only contain lowercase letters, numbers, and hyphens" };
+    }
+
     // Check if subreddit with this name already exists
     const checkExistingQuery = defineQuery(`
         *[_type == "subreddit" && title == $name][0] {
@@ -27,35 +35,33 @@ export async function createSubreddit(
     });
 
     if (existingSubreddit.data) {
-      console.log(`Subreddit "${name}" already exists`);
       return { error: "A subreddit with this name already exists" };
     }
 
-    // Check if slug already exists if custom slug is provided
-    if (customSlug) {
-      const checkSlugQuery = defineQuery(`
-          *[_type == "subreddit" && slug.current == $slug][0] {
-            _id
-          }
-        `);
+    // Check if slug already exists
+    const checkSlugQuery = defineQuery(`
+        *[_type == "subreddit" && slug.current == $slug][0] {
+          _id
+        }
+      `);
 
-      const existingSlug = await sanityFetch({
-        query: checkSlugQuery,
-        params: { slug: customSlug },
-      });
+    const existingSlug = await sanityFetch({
+      query: checkSlugQuery,
+      params: { slug },
+    });
 
-      if (existingSlug.data) {
-        console.log(`Subreddit with slug "${customSlug}" already exists`);
-        return { error: "A subreddit with this URL already exists" };
-      }
+    if (existingSlug.data) {
+      return { error: "A subreddit with this URL already exists" };
     }
-
-    // Create slug from name or use custom slug
-    const slug = customSlug || name.toLowerCase().replace(/\s+/g, "-");
 
     // Upload image if provided
     let imageAsset;
     if (imageData) {
+      // Validate MIME type
+      if (!ALLOWED_IMAGE_TYPES.has(imageData.contentType)) {
+        return { error: "Invalid image type. Allowed types: JPEG, PNG, WebP, GIF" };
+      }
+
       try {
         // Extract base64 data (remove data:image/jpeg;base64, part)
         const base64Data = imageData.base64.split(",")[1];
@@ -63,13 +69,16 @@ export async function createSubreddit(
         // Convert base64 to buffer
         const buffer = Buffer.from(base64Data, "base64");
 
+        // Validate file size
+        if (buffer.length > MAX_IMAGE_SIZE_BYTES) {
+          return { error: "Image size must be 5 MB or less" };
+        }
+
         // Upload to Sanity
         imageAsset = await adminClient.assets.upload("image", buffer, {
           filename: imageData.filename,
           contentType: imageData.contentType,
         });
-
-        console.log("Image asset:", imageAsset);
       } catch (error) {
         console.error("Error uploading image:", error);
         // Continue without image if upload fails

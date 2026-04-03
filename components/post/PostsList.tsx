@@ -1,6 +1,7 @@
 import { getPosts } from "@/sanity/lib/post/getPosts";
 import { currentUser } from "@clerk/nextjs/server";
 import Post from "./Post";
+import type { GetAllPostsQueryResult } from "@/sanity.types";
 
 interface PostsListProps {
   filterType?: "request" | "offer";
@@ -8,21 +9,10 @@ interface PostsListProps {
 }
 
 async function PostsList({ filterType, filterCategory }: PostsListProps) {
-  const posts = await getPosts();
+  const posts = await getPosts(filterType, filterCategory);
   const user = await currentUser();
 
-  // Filter posts by help type and category if specified
-  let filteredPosts = posts;
-  
-  if (filterType) {
-    filteredPosts = filteredPosts.filter((post) => (post as { helpType?: string }).helpType === filterType);
-  }
-  
-  if (filterCategory) {
-    filteredPosts = filteredPosts.filter((post) => (post as { category?: string }).category === filterCategory);
-  }
-
-  if (filteredPosts.length === 0 && filterType) {
+  if (posts.length === 0 && filterType) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500">
@@ -34,7 +24,7 @@ async function PostsList({ filterType, filterCategory }: PostsListProps) {
 
   return (
     <div className="space-y-4">
-      {filteredPosts.map((post) => (
+      {(posts as GetAllPostsQueryResult).map((post) => (
         <Post key={post._id} post={post} userId={user?.id || null} />
       ))}
     </div>

@@ -17,33 +17,28 @@ export const censorPost = tool({
   }),
   execute: async ({ postId, title, body, isToBeReported }) => {
     if (!isToBeReported) {
-      console.log(`>>>>>> Post ${postId} is not reported`);
       return {
         success: true,
         message: `Post ${postId} is not reported`,
       };
     }
 
-    console.log(`>>>>>> Censoring content in post ${postId}`);
-
     const patch = adminClient.patch(postId);
 
     if (title) {
-      console.log(`>>>>>> Censoring title: ${title}`);
       patch.set({ title });
     }
 
     if (body) {
-      console.log(`>>>>>> Censoring body: ${body}`);
       // Convert body to Portable Text format
       const portableTextBody = [
         {
           _type: "block",
-          _key: Date.now().toString(),
+          _key: crypto.randomUUID(),
           children: [
             {
               _type: "span",
-              _key: Date.now().toString() + "1",
+              _key: crypto.randomUUID(),
               text: body,
             },
           ],
@@ -53,7 +48,6 @@ export const censorPost = tool({
     }
 
     if (isToBeReported) {
-      console.log(`>>>>>> Reporting post ${postId}`);
       patch.set({ isReported: true });
     }
 
@@ -73,13 +67,9 @@ export const reportUser = tool({
     userId: z.string().describe("The ID of the user to report"),
   }),
   execute: async ({ userId }) => {
-    console.log(`>>>>>> Reporting user ${userId}`);
-
     const patch = adminClient.patch(userId);
     patch.set({ isReported: true });
     await patch.commit();
-
-    console.log("User reported successfully");
 
     return {
       success: true,

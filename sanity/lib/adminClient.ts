@@ -6,6 +6,6 @@ export const adminClient = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true,
+  useCdn: false,
   token: process.env.SANITY_API_ADMIN_TOKEN,
 });

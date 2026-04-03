@@ -6,6 +6,7 @@ import Post from "@/components/post/Post";
 import TimeAgo from "@/components/TimeAgo";
 import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
+import type { GetAllPostsQueryResult } from "@/sanity.types";
 
 interface UserProfilePageProps {
   params: Promise<{ username: string }>;
@@ -97,7 +98,7 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
             </div>
           ) : (
             <div className="space-y-4">
-              {posts.map((post: any) => (
+              {(posts as GetAllPostsQueryResult).map((post) => (
                 <div key={post._id} className="border-b pb-4 last:border-b-0">
                   <Post post={post} userId={currentUserData?.id || null} />
                 </div>
