@@ -194,7 +194,7 @@ function CreateNeighborhoodButton() {
                 pattern="[a-z0-9-]+"
                 title="Lowercase letters, numbers, and hyphens only"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 This will be used in the URL: sharesphere.com/neighborhood/
                 {slug || "neighborhood-slug"}
               </p>
@@ -241,11 +241,11 @@ function CreateNeighborhoodButton() {
                 <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="community-image"
-                    className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                    className="flex flex-col items-center justify-center w-full h-24 border-2 border-input border-dashed rounded-lg cursor-pointer bg-muted/40 hover:bg-muted/60"
                   >
                     <div className="flex flex-col items-center justify-center">
-                      <ImageIcon className="w-6 h-6 mb-2 text-gray-400" />
-                      <p className="text-xs text-gray-500">
+                      <ImageIcon className="w-6 h-6 mb-2 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">
                         Click to upload an image
                       </p>
                     </div>

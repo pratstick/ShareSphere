@@ -21,11 +21,11 @@ async function NeighborhoodPage({
   return (
     <>
       {/* Neighborhood Banner */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b border-border">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex items-center gap-4">
             {neighborhood?.image && neighborhood.image.asset?._ref && (
-              <div className="relative h-16 w-16 overflow-hidden rounded-full border">
+              <div className="relative h-16 w-16 overflow-hidden rounded-full border border-border">
                 <Image
                   src={urlFor(neighborhood.image).url()}
                   alt={
@@ -40,7 +40,7 @@ async function NeighborhoodPage({
             <div>
               <h1 className="text-2xl font-bold">{neighborhood?.title}</h1>
               {neighborhood?.description && (
-                <p className="text-sm text-gray-600">{neighborhood.description}</p>
+                <p className="text-sm text-muted-foreground">{neighborhood.description}</p>
               )}
             </div>
           </div>
@@ -56,9 +56,9 @@ async function NeighborhoodPage({
                 <Post key={post._id} post={post} userId={user?.id || null} />
               ))
             ) : (
-              <div className="bg-white rounded-md p-6 text-center">
-                <p className="text-gray-500">No help requests or offers in this neighborhood yet.</p>
-                <p className="text-sm text-gray-400 mt-2">Be the first to share how you can help your neighbors!</p>
+              <div className="bg-card rounded-md p-6 text-center border border-border">
+                <p className="text-muted-foreground">No help requests or offers in this neighborhood yet.</p>
+                <p className="text-sm text-muted-foreground/70 mt-2">Be the first to share how you can help your neighbors!</p>
               </div>
             )}
           </div>

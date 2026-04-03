@@ -95,17 +95,17 @@ export async function AppSidebar({
                 </Link>
               </SidebarMenuButton>
 
-              <SidebarMenuButton asChild className="p-5 bg-blue-50 hover:bg-blue-100">
+              <SidebarMenuButton asChild className="p-5 bg-blue-950/50 hover:bg-blue-900/50">
                 <Link href="/create-post?type=offer">
-                  <HandHeart className="w-4 h-4 mr-2 text-blue-600" />
-                  <span className="text-blue-600">Offer Help</span>
+                  <HandHeart className="w-4 h-4 mr-2 text-blue-400" />
+                  <span className="text-blue-400">Offer Help</span>
                 </Link>
               </SidebarMenuButton>
 
-              <SidebarMenuButton asChild className="p-5 bg-orange-50 hover:bg-orange-100">
+              <SidebarMenuButton asChild className="p-5 bg-orange-950/50 hover:bg-orange-900/50">
                 <Link href="/create-post?type=request">
-                  <HelpCircle className="w-4 h-4 mr-2 text-orange-600" />
-                  <span className="text-orange-600">Request Help</span>
+                  <HelpCircle className="w-4 h-4 mr-2 text-orange-400" />
+                  <span className="text-orange-400">Request Help</span>
                 </Link>
               </SidebarMenuButton>
 

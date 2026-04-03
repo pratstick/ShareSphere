@@ -38,14 +38,14 @@ export default function CategoryFilter() {
 
   return (
     <div className="mb-6">
-      <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-2">
+      <label htmlFor="category-filter" className="block text-sm font-medium text-foreground mb-2">
         Filter by Category:
       </label>
       <select
         id="category-filter"
         value={currentCategory}
         onChange={(e) => handleCategoryChange(e.target.value)}
-        className="w-full max-w-xs p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        className="w-full max-w-xs p-2 border border-input rounded-md bg-card text-foreground focus:ring-2 focus:ring-ring focus:border-ring"
       >
         {categories.map((category) => (
           <option key={category.value} value={category.value}>

@@ -41,13 +41,13 @@ function ReportButton({ contentId }: ReportButtonProps) {
     <button
       onClick={handleReport}
       disabled={isReported || isLoading || !isSignedIn}
-      className={`flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-red-500 transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
-        isReported ? "text-red-600 dark:text-red-400" : ""
+      className={`flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+        isReported ? "text-red-400" : ""
       }`}
     >
       <Flag
         size={14}
-        className={isReported ? "fill-red-600 dark:fill-red-400" : ""}
+        className={isReported ? "fill-red-400" : ""}
       />
       <span className="hidden md:block">
         {isReported ? "Reported" : isSignedIn ? "Report" : "Sign in to report"}
