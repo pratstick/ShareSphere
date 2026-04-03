@@ -62,7 +62,7 @@ async function Post({ post, userId }: PostProps) {
   return (
     <article
       key={post._id}
-      className="relative bg-white rounded-md shadow-sm border border-gray-200 hover:border-gray-300 transition-colors"
+      className="relative bg-card rounded-md shadow-sm border border-border hover:border-border/80 transition-colors"
     >
       <div className="flex">
         {/* Vote Buttons */}
@@ -75,7 +75,7 @@ async function Post({ post, userId }: PostProps) {
 
         {/* Post Content */}
         <div className="flex-1 p-3">
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
             {post.subreddit && (
               <>
                 <a
@@ -104,19 +104,19 @@ async function Post({ post, userId }: PostProps) {
 
           {post.subreddit && (
             <div className="flex items-center gap-2 mb-2">
-              <h2 className="text-lg font-medium text-gray-900 flex-1">
+              <h2 className="text-lg font-medium text-foreground flex-1">
                 {post.title}
               </h2>
               <div className="flex items-center gap-2">
                 {category && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                     {getCategoryEmoji(category)} {category.replace('-', ' ')}
                   </span>
                 )}
                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                   isHelpRequest 
-                    ? 'bg-orange-100 text-orange-800' 
-                    : 'bg-blue-100 text-blue-800'
+                    ? 'bg-orange-950/60 text-orange-300' 
+                    : 'bg-blue-950/60 text-blue-300'
                 }`}>
                   {isHelpRequest ? '🙋 Help Needed' : '🤝 Help Offered'}
                 </span>
@@ -125,13 +125,13 @@ async function Post({ post, userId }: PostProps) {
           )}
 
           {post.body && (
-            <div className="prose prose-sm max-w-none text-gray-700 mb-3">
+            <div className="prose prose-sm prose-invert max-w-none text-foreground/80 mb-3">
               <PortableText value={post.body as PortableTextBlock[]} />
             </div>
           )}
 
           {post.image && post.image.asset?._ref && (
-            <div className="relative w-full h-64 mb-3 px-2 bg-gray-100/30 ">
+            <div className="relative w-full h-64 mb-3 px-2 bg-muted/30 ">
               <Image
                 src={urlFor(post.image).url()}
                 alt={post.image.alt || "Post image"}
@@ -141,7 +141,7 @@ async function Post({ post, userId }: PostProps) {
             </div>
           )}
 
-          <button className="flex items-center px-1 py-2 gap-1 text-sm text-gray-500">
+          <button className="flex items-center px-1 py-2 gap-1 text-sm text-muted-foreground">
             <MessageSquare className="w-4 h-4" />
             <span>{comments.length} Comments</span>
           </button>

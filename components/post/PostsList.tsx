@@ -15,7 +15,7 @@ async function PostsList({ filterType, filterCategory }: PostsListProps) {
   if (posts.length === 0 && filterType) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           No {filterType === "request" ? "help requests" : "help offers"} found.
         </p>
       </div>
