@@ -11,8 +11,8 @@
     "seed:chandigarh": "tsx scripts/run-seed.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.17",
-    "@ai-sdk/react": "^1.2.9",
+    "@ai-sdk/openai": "^3.0.50",
+    "@ai-sdk/react": "^3.0.147",
     "@clerk/agent-toolkit": "0.0.25",
     "@clerk/nextjs": "^6.17.0",
     "@portabletext/react": "^6.0.3",
@@ -27,7 +27,7 @@
     "@sanity/client": "^6.29.0",
     "@sanity/image-url": "^1.1.0",
     "@sanity/vision": "^3.86.0",
-    "ai": "^4.3.9",
+    "ai": "^6.0.145",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
