@@ -3,10 +3,10 @@
 export default function SeedPage() {
   const handleAction = async (action: 'seed' | 'clear') => {
     try {
+      // Clerk session cookie is sent automatically with same-origin requests
       const response = await fetch('/api/seed/chandigarh', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer admin-seed-token',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ action })

@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { seedChandgarhData, clearChandgarhData } from "@/scripts/seed-chandigarh";
 
 export async function POST(request: NextRequest) {
   try {
-    // Disable seeding in production for security
-    if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: "Seeding disabled in production" }, { status: 403 });
-    }
-
-    // Simple authentication check - you might want to add proper auth
-    const authHeader = request.headers.get("authorization");
-    if (authHeader !== "Bearer admin-seed-token") {
+    // Require an authenticated Clerk session for all environments
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -62,7 +58,6 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({
-    message: "Use POST method to seed data",
-    instructions: "Send POST request with Authorization: Bearer admin-seed-token"
+    message: "Use POST method to seed data"
   });
 }

@@ -14,6 +14,8 @@ import CommentList from "../comment/CommentList";
 import PostVoteButtons from "./PostVoteButtons";
 import ReportButton from "../ReportButton";
 import DeleteButton from "../DeleteButton";
+import { PortableText } from "@portabletext/react";
+import type { PortableTextBlock } from "@portabletext/types";
 
 interface PostProps {
   post:
@@ -55,8 +57,7 @@ async function Post({ post, userId }: PostProps) {
   const isHelpRequest = helpType === "request" || 
                        (!helpType && (post.title?.toLowerCase().includes('need') || 
                        post.title?.toLowerCase().includes('request') ||
-                       post.title?.toLowerCase().includes('looking for') ||
-                       (post.body?.[0]?.children?.[0]?.text?.toLowerCase().includes('need help'))));
+                       post.title?.toLowerCase().includes('looking for')));
 
   return (
     <article
@@ -123,9 +124,9 @@ async function Post({ post, userId }: PostProps) {
             </div>
           )}
 
-          {post.body && post.body[0]?.children?.[0]?.text && (
+          {post.body && (
             <div className="prose prose-sm max-w-none text-gray-700 mb-3">
-              {post.body[0].children[0].text}
+              <PortableText value={post.body as PortableTextBlock[]} />
             </div>
           )}
 

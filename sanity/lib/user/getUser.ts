@@ -10,36 +10,44 @@ interface UserResult {
   email: string;
 }
 
-const parseUsername = (username: string) => {
-  // Remove whitespace and convert to camelCase with random number to avoid conflicts
-  const randomNum = Math.floor(1000 + Math.random() * 9000);
+/**
+ * Derives a stable, slug-friendly username from Clerk user fields.
+ * Never uses Math.random() – uniqueness is guaranteed by Clerk's user ID
+ * being used as the Sanity document _id via createIfNotExists.
+ */
+const deriveUsername = (user: {
+  fullName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  primaryEmailAddress?: { emailAddress: string } | null;
+  emailAddresses: { emailAddress: string }[];
+}): string => {
+  const displayName =
+    user.fullName?.trim() ||
+    [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
+    user.primaryEmailAddress?.emailAddress.split("@")[0] ||
+    user.emailAddresses[0]?.emailAddress.split("@")[0] ||
+    "user";
 
-  // Convert whitespace to camelCase and add random number to avoid conflicts
-  return (
-    username
-      .replace(/\s+(.)/g, (_, char) => char.toUpperCase()) // Convert whitespace to camelCase
-      .replace(/\s+/g, "") + randomNum // Remove all whitespace and add random number
-  );
+  // Convert to slug-friendly format (no random suffix needed because the
+  // Clerk user ID is already used as the document _id, so two concurrent
+  // requests for the same user will resolve to the same document).
+  return displayName.replace(/\s+(.)/g, (_, char: string) => char.toUpperCase()).replace(/\s+/g, "");
 };
 
 export async function getUser(): Promise<UserResult | { error: string }> {
   try {
-    console.log("Getting current user from Clerk");
     const loggedInUser = await currentUser();
 
     if (!loggedInUser) {
-      console.log("No user logged in");
       return { error: "User not found" };
     }
-
-    console.log(`Found Clerk user: ${loggedInUser.id}`);
 
     // Check if user exists in the database first
     const getExistingUserQuery = defineQuery(
       `*[_type == "user" && _id == $id][0]`
     );
 
-    console.log("Checking if user exists in Sanity database");
     const existingUser = await sanityFetch({
       query: getExistingUserQuery,
       params: { id: loggedInUser.id },
@@ -47,7 +55,6 @@ export async function getUser(): Promise<UserResult | { error: string }> {
 
     // If user exists, return the user data
     if (existingUser.data?._id) {
-      console.log(`User found in database with ID: ${existingUser.data._id}`);
       const user = {
         _id: existingUser.data._id,
         username: existingUser.data.username!,
@@ -58,18 +65,18 @@ export async function getUser(): Promise<UserResult | { error: string }> {
       return user;
     }
 
-    console.log("User not found in database, creating new user");
-    // If user doesn't exist, create a new user
+    // If user doesn't exist, create a new user.
+    // addUser uses createIfNotExists, so concurrent calls for the same
+    // Clerk ID are safe – only one document will ever be created.
     const newUser = await addUser({
       id: loggedInUser.id,
-      username: parseUsername(loggedInUser.fullName!),
+      username: deriveUsername(loggedInUser),
       email:
         loggedInUser.primaryEmailAddress?.emailAddress ||
         loggedInUser.emailAddresses[0].emailAddress,
       imageUrl: loggedInUser.imageUrl,
     });
 
-    console.log(`New user created with ID: ${newUser._id}`);
     const user = {
       _id: newUser._id,
       username: newUser.username!,
