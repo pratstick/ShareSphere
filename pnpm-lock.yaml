@@ -69,8 +69,8 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       groq:
-        specifier: ^3.86.0
-        version: 3.86.0
+        specifier: ^5.19.0
+        version: 5.19.0
       lucide-react:
         specifier: ^0.503.0
         version: 0.503.0(react@19.1.0)
@@ -4367,6 +4367,14 @@ packages:
   groq@3.86.0:
     resolution: {integrity: sha512-cz2eF+7Suoo3PaeAvPV+QDDe+q+EzNuVM5d9GIJQlBMkqtjbFti9Ebb1DmNFa8DoBn8AMbLFGzbJoXH6rsZYZA==}
     engines: {node: '>=18'}
+
+  groq@3.99.0:
+    resolution: {integrity: sha512-ZwKAWzvVCw51yjmIf5484KgsAzZAlGTM4uy9lki4PjAYxcEME2Xf93d31LhHzgUAr2JI79H+cNKoRjDHdv1BXQ==}
+    engines: {node: '>=18'}
+
+  groq@5.19.0:
+    resolution: {integrity: sha512-59XhBOC5pqNg4+3yPKerERkq2LS9qUCmBrPC2i2d5HwYK5FR+MGZb+1g7jBOUSenB2UIxBVwM537YVXr+lzDvQ==}
+    engines: {node: '>=20.19 <22 || >=22.12'}
 
   gunzip-maybe@1.4.2:
     resolution: {integrity: sha512-4haO1M4mLO91PW57BMsDFf75UmwoRX0GkdD+Faw+Lr+r/OZrOCS0pIBwOL1xCKQqnQzbNFGgK2V2CpBUPeFNTw==}
@@ -11629,6 +11637,10 @@ snapshots:
 
   groq@3.86.0: {}
 
+  groq@3.99.0: {}
+
+  groq@5.19.0: {}
+
   gunzip-maybe@1.4.2:
     dependencies:
       browserify-zlib: 0.1.4
@@ -12408,7 +12420,7 @@ snapshots:
       '@sanity/types': 3.86.0(@types/react@19.1.2)(debug@4.4.0)
       '@sanity/ui': 2.15.13(@emotion/is-prop-valid@1.2.2)(react-dom@19.1.0(react@19.1.0))(react-is@18.3.1)(react@19.1.0)(styled-components@6.1.17(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       '@sanity/visual-editing': 2.13.18(@emotion/is-prop-valid@1.2.2)(@sanity/client@6.29.0)(@sanity/types@3.86.0(@types/react@19.1.2))(next@16.2.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react-is@18.3.1)(react@19.1.0)(styled-components@6.1.17(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
-      groq: 3.86.0
+      groq: 3.99.0
       history: 5.3.0
       next: 16.2.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
