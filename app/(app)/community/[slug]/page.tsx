@@ -21,11 +21,11 @@ async function CommunityPage({
   return (
     <>
       {/* Community Banner */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b border-border">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex items-center gap-4">
             {community?.image && community.image.asset?._ref && (
-              <div className="relative h-16 w-16 overflow-hidden rounded-full border">
+              <div className="relative h-16 w-16 overflow-hidden rounded-full border border-border">
                 <Image
                   src={urlFor(community.image).url()}
                   alt={
@@ -40,7 +40,7 @@ async function CommunityPage({
             <div>
               <h1 className="text-2xl font-bold">{community?.title}</h1>
               {community?.description && (
-                <p className="text-sm text-gray-600">{community.description}</p>
+                <p className="text-sm text-muted-foreground">{community.description}</p>
               )}
             </div>
           </div>
@@ -56,8 +56,8 @@ async function CommunityPage({
                 <Post key={post._id} post={post} userId={user?.id || null} />
               ))
             ) : (
-              <div className="bg-white rounded-md p-6 text-center">
-                <p className="text-gray-500">No posts in this community yet.</p>
+              <div className="bg-card rounded-md p-6 text-center border border-border">
+                <p className="text-muted-foreground">No posts in this community yet.</p>
               </div>
             )}
           </div>

@@ -14,14 +14,14 @@ async function SearchPage({
   return (
     <>
       {/* Banner */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b border-border">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex items-center">
             <div>
               <h1 className="text-2xl font-bold">
                 Search Results ({subreddits.length})
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Communities matching &quot;{query}&quot;
               </p>
             </div>
@@ -36,26 +36,26 @@ async function SearchPage({
             {subreddits.map((subreddit) => (
               <li
                 key={subreddit._id}
-                className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden"
+                className="border border-border rounded-lg overflow-hidden"
               >
                 <Link
                   href={`/community/${subreddit.slug}`}
-                  className="flex items-center cursor-pointer gap-4 py-5 px-4 hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+                  className="flex items-center cursor-pointer gap-4 py-5 px-4 hover:bg-muted transition-colors"
                 >
-                  <Avatar className="h-12 w-12 border-2 border-red-200 dark:border-red-800 shadow-sm">
+                  <Avatar className="h-12 w-12 border-2 border-border shadow-sm">
                     {subreddit.image && (
                       <AvatarImage
                         src={urlFor(subreddit.image).url()}
                         className="object-contain"
                       />
                     )}
-                    <AvatarFallback className="text-lg font-semibold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200">
+                    <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
                       {subreddit.title?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <h2 className="text-lg font-medium">{subreddit.title}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
+                    <p className="text-sm text-muted-foreground line-clamp-1">
                       {subreddit.description}
                     </p>
                   </div>
@@ -63,7 +63,7 @@ async function SearchPage({
               </li>
             ))}
             {subreddits.length === 0 && (
-              <li className="py-8 text-center text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded-lg">
+              <li className="py-8 text-center text-muted-foreground border border-border rounded-lg">
                 No communities found matching your search.
               </li>
             )}

@@ -17,19 +17,19 @@ async function CreatePostPage({
     return (
       <>
         {/* Banner */}
-        <section className="bg-white border-b">
+        <section className="bg-card border-b border-border">
           <div className="mx-auto max-w-7xl px-4 py-6">
             <div className="flex items-center">
               <div>
                 <h1 className="text-2xl font-bold">
                   {type === "request" ? "Request Help" : "Offer Help"}
                 </h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {type === "request" 
                     ? "Ask for help in" 
                     : "Offer help in"
                   }{" "}
-                  <span className="font-bold">{neighborhood}</span> neighborhood
+                  <span className="font-bold text-foreground">{neighborhood}</span> neighborhood
                 </p>
               </div>
             </div>
@@ -47,13 +47,13 @@ async function CreatePostPage({
   return (
     <>
       {/* Banner */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b border-border">
         <div className="mx-auto max-w-7xl px-4 py-6">            <div className="flex items-center">
               <div>
                 <h1 className="text-2xl font-bold">
                   {type === "request" ? "Request Help" : "Share Help"}
                 </h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {type === "request" 
                     ? "Select a neighborhood to request help from"
                     : "Select a neighborhood to offer help to"
@@ -78,9 +78,9 @@ async function CreatePostPage({
                 helpType={type}
               />
 
-              <hr className="my-4" />
+              <hr className="my-4 border-border" />
 
-              <p className="mt-4 text-sm text-gray-600">
+              <p className="mt-4 text-sm text-muted-foreground">
                 If you don&apos;t see your neighborhood, you can create it here.
               </p>
               <div className="mt-2">

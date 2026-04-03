@@ -13,7 +13,7 @@ function Header() {
   const { toggleSidebar, open, isMobile } = useSidebar();
 
   return (
-    <header className="flex items-center justify-between p-4 border-b border-gray-200">
+    <header className="flex items-center justify-between p-4 border-b border-border">
       {/* Left Side */}
       <div className="h-10 flex items-center">
         {open && !isMobile ? (
