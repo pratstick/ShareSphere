@@ -1,5 +1,6 @@
-import { defineQuery } from "next-sanity";
-import { sanityFetch } from "../live";
+import { defineQuery } from "groq";
+import { sanityFetch, sanityTags } from "../fetch";
+import type { GetSubredditBySlugQueryResult } from "@/sanity.types";
 
 export async function getSubredditBySlug(slug: string) {
   const lowerCaseSlug = slug.toLowerCase();
@@ -10,9 +11,10 @@ export async function getSubredditBySlug(slug: string) {
       "moderator": moderator->,
     }`);
 
-  const subreddit = await sanityFetch({
+  const subreddit = await sanityFetch<GetSubredditBySlugQueryResult>({
     query: getSubredditBySlugQuery,
     params: { slug: lowerCaseSlug },
+    tags: [sanityTags.subreddits, sanityTags.subreddit(lowerCaseSlug)],
   });
 
   return subreddit.data;

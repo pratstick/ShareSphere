@@ -1,10 +1,19 @@
 import { ImageData } from "@/action/createCommunity";
 import { defineQuery } from "groq";
-import { sanityFetch } from "../live";
+import { sanityFetch } from "../fetch";
 import { adminClient } from "../adminClient";
 import { Subreddit } from "@/sanity.types";
+import type {
+  CheckExistingQueryResult,
+  CheckSlugQueryResult,
+} from "@/sanity.types";
 
-const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const SLUG_REGEX = /^[a-z0-9-]+$/;
 
@@ -13,13 +22,16 @@ export async function createSubreddit(
   moderatorId: string,
   imageData: ImageData | null,
   customSlug?: string,
-  customDescription?: string
+  customDescription?: string,
 ) {
   try {
     // Validate and sanitize slug before any DB operations
     const slug = customSlug || name.toLowerCase().replace(/\s+/g, "-");
     if (!SLUG_REGEX.test(slug)) {
-      return { error: "URL slug may only contain lowercase letters, numbers, and hyphens" };
+      return {
+        error:
+          "URL slug may only contain lowercase letters, numbers, and hyphens",
+      };
     }
 
     // Check if subreddit with this name already exists
@@ -29,9 +41,10 @@ export async function createSubreddit(
         }
       `);
 
-    const existingSubreddit = await sanityFetch({
+    const existingSubreddit = await sanityFetch<CheckExistingQueryResult>({
       query: checkExistingQuery,
       params: { name },
+      cache: "no-store",
     });
 
     if (existingSubreddit.data) {
@@ -45,9 +58,10 @@ export async function createSubreddit(
         }
       `);
 
-    const existingSlug = await sanityFetch({
+    const existingSlug = await sanityFetch<CheckSlugQueryResult>({
       query: checkSlugQuery,
       params: { slug },
+      cache: "no-store",
     });
 
     if (existingSlug.data) {
@@ -59,7 +73,9 @@ export async function createSubreddit(
     if (imageData) {
       // Validate MIME type
       if (!ALLOWED_IMAGE_TYPES.has(imageData.contentType)) {
-        return { error: "Invalid image type. Allowed types: JPEG, PNG, WebP, GIF" };
+        return {
+          error: "Invalid image type. Allowed types: JPEG, PNG, WebP, GIF",
+        };
       }
 
       try {

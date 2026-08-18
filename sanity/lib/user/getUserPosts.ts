@@ -1,5 +1,6 @@
-import { sanityFetch } from "../live";
+import { sanityFetch, sanityTags } from "../fetch";
 import { defineQuery } from "groq";
+import type { GetUserPostsQueryResult } from "@/sanity.types";
 
 export async function getUserPosts(userId: string) {
   try {
@@ -45,10 +46,14 @@ export async function getUserPosts(userId: string) {
         "upvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "upvote"]),
         "downvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "downvote"]),
         "commentCount": count(*[_type == "comment" && post._ref == ^._id])
-      }`
+      }`,
     );
 
-    const result = await sanityFetch({ query: getUserPostsQuery, params: { userId } });
+    const result = await sanityFetch<GetUserPostsQueryResult>({
+      query: getUserPostsQuery,
+      params: { userId },
+      tags: [sanityTags.posts, sanityTags.user(userId)],
+    });
     return result.data || [];
   } catch (error) {
     console.error("Error fetching user posts:", error);

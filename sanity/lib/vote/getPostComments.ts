@@ -1,5 +1,6 @@
 import { defineQuery } from "groq";
-import { sanityFetch } from "../live";
+import { sanityFetch, sanityTags } from "../fetch";
+import type { GetPostCommentsQueryResult } from "@/sanity.types";
 
 // Get all top-level comments for a post
 export async function getPostComments(postId: string, userId: string | null) {
@@ -20,9 +21,11 @@ export async function getPostComments(postId: string, userId: string | null) {
     } | order(votes.netScore desc, createdAt desc) // votes.netScore desc -> if you want to sort by net score
   `);
 
-  const result = await sanityFetch({
+  const result = await sanityFetch<GetPostCommentsQueryResult>({
     query: getPostCommentsQuery,
     params: { postId, userId: userId || "" },
+    tags: [sanityTags.comments, sanityTags.post(postId)],
+    cache: "no-store",
   });
 
   return result.data || [];

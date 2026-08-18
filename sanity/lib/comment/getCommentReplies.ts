@@ -1,10 +1,11 @@
 import { defineQuery } from "groq";
-import { sanityFetch } from "../live";
+import { sanityFetch, sanityTags } from "../fetch";
+import type { GetCommentRepliesQueryResult } from "@/sanity.types";
 
 // Get replies to a specific comment
 export async function getCommentReplies(
   commentId: string,
-  userId: string | null
+  userId: string | null,
 ) {
   const getCommentRepliesQuery = defineQuery(`
       *[_type == "comment" && parentComment._ref == $commentId] {
@@ -23,9 +24,11 @@ export async function getCommentReplies(
       } | order(votes.netScore desc) //votes.netScore desc -> if you want to sort by net score
     `);
 
-  const result = await sanityFetch({
+  const result = await sanityFetch<GetCommentRepliesQueryResult>({
     query: getCommentRepliesQuery,
     params: { commentId, userId: userId || "" },
+    tags: [sanityTags.comments],
+    cache: "no-store",
   });
 
   return result.data || [];

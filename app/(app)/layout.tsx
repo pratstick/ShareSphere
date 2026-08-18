@@ -5,7 +5,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import Header from "@/components/header/Header";
-import { SanityLive } from "@/sanity/lib/live";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ShareSphere - Neighborhood Help Platform",
-  description: "Connect with your neighbors to share and request help in your community",
+  description:
+    "Connect with your neighbors to share and request help in your community",
 };
 
 export default function RootLayout({
@@ -42,8 +42,6 @@ export default function RootLayout({
               <div className="flex flex-col">{children}</div>
             </SidebarInset>
           </SidebarProvider>
-
-          <SanityLive />
         </body>
       </html>
     </ClerkProvider>

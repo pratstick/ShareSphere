@@ -1,5 +1,6 @@
-import { sanityFetch } from "../live";
+import { sanityFetch, sanityTags } from "../fetch";
 import { defineQuery } from "groq";
+import type { SearchSubredditsQueryResult } from "@/sanity.types";
 
 export async function searchSubreddits(searchTerm: string) {
   // Skip empty search terms
@@ -18,9 +19,10 @@ export async function searchSubreddits(searchTerm: string) {
     createdAt
   } | order(createdAt desc)`);
 
-  const results = await sanityFetch({
+  const results = await sanityFetch<SearchSubredditsQueryResult>({
     query: searchSubredditsQuery,
     params: { searchTerm: searchTerm.toLowerCase() },
+    tags: [sanityTags.subreddits],
   });
 
   return results.data;

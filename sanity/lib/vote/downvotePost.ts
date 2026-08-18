@@ -1,15 +1,17 @@
-import { defineQuery } from "next-sanity";
+import { defineQuery } from "groq";
 import { adminClient } from "../adminClient";
-import { sanityFetch } from "../live";
+import { sanityFetch } from "../fetch";
+import type { ExistingVoteDownvoteQueryResult } from "@/sanity.types";
 
 export async function downvotePost(postId: string, userId: string) {
   // Check if user has already voted on this post
   const existingVoteDownvoteQuery = defineQuery(
-    `*[_type == "vote" && post._ref == $postId && user._ref == $userId][0]`
+    `*[_type == "vote" && post._ref == $postId && user._ref == $userId][0]`,
   );
-  const existingVote = await sanityFetch({
+  const existingVote = await sanityFetch<ExistingVoteDownvoteQueryResult>({
     query: existingVoteDownvoteQuery,
     params: { postId, userId },
+    cache: "no-store",
   });
 
   if (existingVote.data) {

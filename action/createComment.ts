@@ -2,11 +2,13 @@
 
 import { addComment } from "@/sanity/lib/comment/addComment";
 import { getUser } from "@/sanity/lib/user/getUser";
+import { revalidateTag } from "next/cache";
+import { sanityTags } from "@/sanity/lib/fetch";
 
 export async function createComment(
   postId: string,
   content: string,
-  parentCommentId?: string
+  parentCommentId?: string,
 ) {
   const user = await getUser();
 
@@ -21,6 +23,10 @@ export async function createComment(
       content,
       parentCommentId,
     });
+
+    revalidateTag(sanityTags.comments, "max");
+    revalidateTag(sanityTags.post(postId), "max");
+    revalidateTag(sanityTags.user(user._id), "max");
 
     return { comment };
   } catch (error) {

@@ -24,7 +24,7 @@ async function PostsList({ filterType, filterCategory }: PostsListProps) {
 
   return (
     <div className="space-y-4">
-      {(posts as GetAllPostsQueryResult).map((post) => (
+      {posts.map((post) => (
         <Post key={post._id} post={post} userId={user?.id || null} />
       ))}
     </div>

@@ -10,8 +10,15 @@ import { createClerkToolkit } from "@clerk/agent-toolkit/ai-sdk";
 import { openai } from "@ai-sdk/openai";
 import { censorPost, reportUser } from "@/tools/tools";
 import { systemPrompt } from "@/tools/prompt";
+import { revalidateTag } from "next/cache";
+import { sanityTags } from "@/sanity/lib/fetch";
 
-const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export type PostImageData = {
@@ -62,7 +69,9 @@ export async function createPost({
     if (imageBase64 && imageFilename && imageContentType) {
       // Validate MIME type
       if (!ALLOWED_IMAGE_TYPES.has(imageContentType)) {
-        return { error: "Invalid image type. Allowed types: JPEG, PNG, WebP, GIF" };
+        return {
+          error: "Invalid image type. Allowed types: JPEG, PNG, WebP, GIF",
+        };
       }
 
       try {
@@ -116,7 +125,22 @@ export async function createPost({
         _ref: subreddit._id,
       },
       helpType: (helpType || "request") as "request" | "offer",
-      category: (category || "other") as "grocery" | "pet-care" | "tech-support" | "home-garden" | "transportation" | "childcare" | "tutoring" | "repairs" | "food" | "deliveries" | "health" | "professional" | "events" | "books" | "other",
+      category: (category || "other") as
+        | "grocery"
+        | "pet-care"
+        | "tech-support"
+        | "home-garden"
+        | "transportation"
+        | "childcare"
+        | "tutoring"
+        | "repairs"
+        | "food"
+        | "deliveries"
+        | "health"
+        | "professional"
+        | "events"
+        | "books"
+        | "other",
       publishedAt: new Date().toISOString(),
     };
 
@@ -132,6 +156,11 @@ export async function createPost({
     }
 
     const post = await adminClient.create(postDoc as Post);
+
+    revalidateTag(sanityTags.posts, "max");
+    revalidateTag(sanityTags.subreddits, "max");
+    revalidateTag(sanityTags.subreddit(subredditSlug), "max");
+    revalidateTag(sanityTags.user(user._id), "max");
 
     // Call the content moderation API
     const messages: CoreMessage[] = [

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typegen": "sanity schema extract && sanity typegen generate",
+    "typegen": "sanity schema extract && sanity typegen generate --config-path sanity-typegen.json",
     "seed:chandigarh": "tsx scripts/run-seed.ts"
   },
   "dependencies": {

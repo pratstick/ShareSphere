@@ -1,7 +1,8 @@
-import { sanityFetch } from "../live";
+import { sanityFetch } from "../fetch";
 import { defineQuery } from "groq";
 import { currentUser } from "@clerk/nextjs/server";
 import { addUser } from "./addUser";
+import type { GetExistingUserQueryResult } from "@/sanity.types";
 
 interface UserResult {
   _id: string;
@@ -32,7 +33,9 @@ const deriveUsername = (user: {
   // Convert to slug-friendly format (no random suffix needed because the
   // Clerk user ID is already used as the document _id, so two concurrent
   // requests for the same user will resolve to the same document).
-  return displayName.replace(/\s+(.)/g, (_, char: string) => char.toUpperCase()).replace(/\s+/g, "");
+  return displayName
+    .replace(/\s+(.)/g, (_, char: string) => char.toUpperCase())
+    .replace(/\s+/g, "");
 };
 
 export async function getUser(): Promise<UserResult | { error: string }> {
@@ -45,12 +48,13 @@ export async function getUser(): Promise<UserResult | { error: string }> {
 
     // Check if user exists in the database first
     const getExistingUserQuery = defineQuery(
-      `*[_type == "user" && _id == $id][0]`
+      `*[_type == "user" && _id == $id][0]`,
     );
 
-    const existingUser = await sanityFetch({
+    const existingUser = await sanityFetch<GetExistingUserQueryResult>({
       query: getExistingUserQuery,
       params: { id: loggedInUser.id },
+      cache: "no-store",
     });
 
     // If user exists, return the user data

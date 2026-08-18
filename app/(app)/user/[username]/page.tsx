@@ -6,16 +6,17 @@ import Post from "@/components/post/Post";
 import TimeAgo from "@/components/TimeAgo";
 import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
-import type { GetAllPostsQueryResult } from "@/sanity.types";
 
 interface UserProfilePageProps {
   params: Promise<{ username: string }>;
 }
 
-export default async function UserProfilePage({ params }: UserProfilePageProps) {
+export default async function UserProfilePage({
+  params,
+}: UserProfilePageProps) {
   const { username } = await params;
   const currentUserData = await currentUser();
-  
+
   // Get user profile data
   const user = await getUserByUsername(username);
   if (!user) {
@@ -25,10 +26,11 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
   // Get user's posts and comments
   const [posts, comments] = await Promise.all([
     getUserPosts(user._id),
-    getUserComments(user._id)
+    getUserComments(user._id),
   ]);
 
   const isOwnProfile = currentUserData?.username === username;
+  const displayName = user.username ?? "Anonymous neighbor";
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -36,41 +38,44 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
       <div className="bg-card rounded-lg shadow-sm border border-border p-6 mb-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-            {user.firstName?.[0] || user.username[0]}
+            {displayName[0]?.toUpperCase()}
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {user.firstName && user.lastName 
-                ? `${user.firstName} ${user.lastName}` 
-                : user.username
-              }
+              {displayName}
             </h1>
-            <p className="text-muted-foreground">@{user.username}</p>
+            <p className="text-muted-foreground">@{displayName}</p>
             {isOwnProfile && (
-              <Badge variant="secondary" className="mt-1">Your Profile</Badge>
+              <Badge variant="secondary" className="mt-1">
+                Your Profile
+              </Badge>
             )}
           </div>
         </div>
-        
+
         {/* Stats */}
         <div className="flex gap-6 mt-4 pt-4 border-t border-border">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-400">{posts.length}</div>
+            <div className="text-2xl font-bold text-blue-400">
+              {posts.length}
+            </div>
             <div className="text-sm text-muted-foreground">Posts</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-400">{comments.length}</div>
+            <div className="text-2xl font-bold text-green-400">
+              {comments.length}
+            </div>
             <div className="text-sm text-muted-foreground">Comments</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-400">
-              {posts.filter((p: { helpType: string }) => p.helpType === "offer").length}
+              {posts.filter((post) => post.helpType === "offer").length}
             </div>
             <div className="text-sm text-muted-foreground">Help Offered</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-orange-400">
-              {posts.filter((p: { helpType: string }) => p.helpType === "request").length}
+              {posts.filter((post) => post.helpType === "request").length}
             </div>
             <div className="text-sm text-muted-foreground">Help Requested</div>
           </div>
@@ -98,8 +103,11 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
             </div>
           ) : (
             <div className="space-y-4">
-              {(posts as GetAllPostsQueryResult).map((post) => (
-                <div key={post._id} className="border-b border-border pb-4 last:border-b-0">
+              {posts.map((post) => (
+                <div
+                  key={post._id}
+                  className="border-b border-border pb-4 last:border-b-0"
+                >
                   <Post post={post} userId={currentUserData?.id || null} />
                 </div>
               ))}
@@ -120,31 +128,34 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
             </div>
           ) : (
             <div className="space-y-4">
-              {comments.slice(0, 5).map((comment: { 
-                _id: string; 
-                content: string; 
-                createdAt: string;
-                post: { 
-                  title: string; 
-                  subreddit: { 
-                    slug: { current: string } 
-                  } 
-                }
-              }) => (
-                <div key={comment._id} className="border-l-2 border-primary/40 pl-4">
-                  <div className="text-sm text-muted-foreground mb-1">
-                    Commented on{" "}
-                    <a 
-                      href={`/neighborhood/${comment.post.subreddit.slug.current}`}
-                      className="text-primary hover:underline"
-                    >
-                      {comment.post.title}
-                    </a>{" "}
-                    <TimeAgo date={new Date(comment.createdAt)} />
+              {comments.slice(0, 5).map((comment) => {
+                const slug = comment.post?.subreddit?.slug?.current;
+
+                if (!slug) return null;
+
+                return (
+                  <div
+                    key={comment._id}
+                    className="border-l-2 border-primary/40 pl-4"
+                  >
+                    <div className="text-sm text-muted-foreground mb-1">
+                      Commented on{" "}
+                      <a
+                        href={`/neighborhood/${slug}`}
+                        className="text-primary hover:underline"
+                      >
+                        {comment.post?.title ?? "a post"}
+                      </a>{" "}
+                      {comment.createdAt && (
+                        <TimeAgo date={new Date(comment.createdAt)} />
+                      )}
+                    </div>
+                    <div className="text-foreground">
+                      {comment.content ?? ""}
+                    </div>
                   </div>
-                  <div className="text-foreground">{comment.content}</div>
-                </div>
-              ))}
+                );
+              })}
               {comments.length > 5 && (
                 <div className="text-center pt-4">
                   <button className="text-primary hover:underline">

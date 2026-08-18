@@ -1,5 +1,6 @@
 import { defineQuery } from "groq";
-import { sanityFetch } from "../live";
+import { sanityFetch, sanityTags } from "../fetch";
+import type { GetPostVotesQueryResult } from "@/sanity.types";
 
 // Get post votes summarized by type
 export async function getPostVotes(postId: string) {
@@ -10,9 +11,10 @@ export async function getPostVotes(postId: string) {
       }
     `);
 
-  const result = await sanityFetch({
+  const result = await sanityFetch<GetPostVotesQueryResult>({
     query: getPostVotesQuery,
     params: { postId },
+    tags: [sanityTags.posts, sanityTags.post(postId)],
   });
 
   const { upvotes, downvotes } = result.data ?? { upvotes: 0, downvotes: 0 };

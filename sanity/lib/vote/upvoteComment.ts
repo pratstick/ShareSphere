@@ -1,15 +1,17 @@
-import { defineQuery } from "next-sanity";
+import { defineQuery } from "groq";
 import { adminClient } from "../adminClient";
-import { sanityFetch } from "../live";
+import { sanityFetch } from "../fetch";
+import type { ExistingVoteUpvoteCommentQueryResult } from "@/sanity.types";
 
 export async function upvoteComment(commentId: string, userId: string) {
   // Check if user has already voted on this comment
   const existingVoteUpvoteCommentQuery = defineQuery(
-    `*[_type == "vote" && comment._ref == $commentId && user._ref == $userId][0]`
+    `*[_type == "vote" && comment._ref == $commentId && user._ref == $userId][0]`,
   );
-  const existingVote = await sanityFetch({
+  const existingVote = await sanityFetch<ExistingVoteUpvoteCommentQueryResult>({
     query: existingVoteUpvoteCommentQuery,
     params: { commentId, userId },
+    cache: "no-store",
   });
 
   if (existingVote.data) {

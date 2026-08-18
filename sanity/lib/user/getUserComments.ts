@@ -1,5 +1,6 @@
-import { sanityFetch } from "../live";
+import { sanityFetch, sanityTags } from "../fetch";
 import { defineQuery } from "groq";
+import type { GetUserCommentsQueryResult } from "@/sanity.types";
 
 export async function getUserComments(userId: string) {
   try {
@@ -23,10 +24,14 @@ export async function getUserComments(userId: string) {
             slug
           }
         }
-      }`
+      }`,
     );
 
-    const result = await sanityFetch({ query: getUserCommentsQuery, params: { userId } });
+    const result = await sanityFetch<GetUserCommentsQueryResult>({
+      query: getUserCommentsQuery,
+      params: { userId },
+      tags: [sanityTags.comments, sanityTags.user(userId)],
+    });
     return result.data || [];
   } catch (error) {
     console.error("Error fetching user comments:", error);

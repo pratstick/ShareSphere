@@ -2,10 +2,7 @@
 
 import { downvote } from "@/action/downvote";
 import { upvote } from "@/action/upvote";
-import {
-  GetPostVotesQueryResult,
-  GetUserPostVoteStatusQueryResult,
-} from "@/sanity.types";
+import { GetUserPostVoteStatusQueryResult } from "@/sanity.types";
 import { useUser } from "@clerk/nextjs";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
@@ -18,7 +15,7 @@ function PostVoteButtons({
   contentType = "post",
 }: {
   contentId: string;
-  votes: GetPostVotesQueryResult;
+  votes: { upvotes: number; downvotes: number; netScore: number };
   vote: GetUserPostVoteStatusQueryResult;
   contentType?: "post" | "comment";
 }) {
@@ -28,7 +25,7 @@ function PostVoteButtons({
   const [optimisticVote, setOptimisticVote] =
     useState<GetUserPostVoteStatusQueryResult>(vote);
   const [optimisticScore, setOptimisticScore] = useState<number>(
-    votes.netScore
+    votes.netScore,
   );
 
   const handleUpvote = () => {
