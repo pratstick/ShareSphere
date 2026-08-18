@@ -475,7 +475,7 @@ export type GetPostByIdQueryResult = {
 
 // Source: ./sanity/lib/post/getPosts.ts
 // Variable: getAllPostsQuery
-// Query: *[_type == "post" && isDeleted != true] {    _id,    title,    "slug": slug.current,    body,    publishedAt,    "author": author->,    "subreddit": subreddit->,    image,    helpType,    category,    isDeleted  } | order(publishedAt desc)
+// Query: *[_type == "post" && isDeleted != true  && ($filterType == null || helpType == $filterType)  && ($filterCategory == null || category == $filterCategory)] {  _id,  title,  "slug": slug.current,  body,  publishedAt,  "author": author->,  "subreddit": subreddit->,  image,  helpType,  category,  isDeleted} | order(publishedAt desc)
 export type GetAllPostsQueryResult = Array<{
   _id: string;
   title: string | null;
@@ -566,22 +566,37 @@ export type CheckExistingQueryResult = {
   _id: string;
 } | null;
 // Variable: checkSlugQuery
-// Query: *[_type == "subreddit" && slug.current == $slug][0] {            _id          }
+// Query: *[_type == "subreddit" && slug.current == $slug][0] {          _id        }
 export type CheckSlugQueryResult = {
   _id: string;
 } | null;
 
 // Source: ./sanity/lib/subreddit/getPostsForSubreddit.ts
 // Variable: getPostsForSubredditQuery
-// Query: *[_type == "post" && subreddit._ref == $id] {        ...,        "slug": slug.current,        "author": author->,        "subreddit": subreddit->,        "category": category->,        "upvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "upvote"]),        "downvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "downvote"]),        "netScore": count(*[_type == "vote" && post._ref == ^._id && voteType == "upvote"]) - count(*[_type == "vote" && post._ref == ^._id && voteType == "downvote"]),        "commentCount": count(*[_type == "comment" && post._ref == ^._id])      } | order(publishedAt desc)
+// Query: *[_type == "post" && subreddit._ref == $id] {        _id,        title,        "slug": slug.current,        body,        publishedAt,        "author": author->,        "subreddit": subreddit->,        image,        helpType,        category,        isDeleted      } | order(publishedAt desc)
 export type GetPostsForSubredditQueryResult = Array<{
   _id: string;
-  _type: "post";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  originalTitle?: string;
+  title: string | null;
+  slug: null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  publishedAt: string | null;
   author: {
     _id: string;
     _type: "user";
@@ -624,25 +639,7 @@ export type GetPostsForSubredditQueryResult = Array<{
     };
     createdAt?: string;
   } | null;
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  image?: {
+  image: {
     asset?: {
       _ref: string;
       _type: "reference";
@@ -654,17 +651,10 @@ export type GetPostsForSubredditQueryResult = Array<{
     crop?: SanityImageCrop;
     alt?: string;
     _type: "image";
-  };
-  helpType?: "offer" | "request";
-  category: null;
-  isReported?: boolean;
-  publishedAt?: string;
-  isDeleted?: boolean;
-  slug: null;
-  upvotes: number;
-  downvotes: number;
-  netScore: number;
-  commentCount: number;
+  } | null;
+  helpType: "offer" | "request" | null;
+  category: "books" | "childcare" | "deliveries" | "events" | "food" | "grocery" | "health" | "home-garden" | "other" | "pet-care" | "professional" | "repairs" | "tech-support" | "transportation" | "tutoring" | null;
+  isDeleted: boolean | null;
 }>;
 
 // Source: ./sanity/lib/subreddit/getSubredditBySlug.ts
@@ -798,6 +788,121 @@ export type GetExistingUserQueryResult = {
   joinedAt?: string;
   isReported?: boolean;
 } | null;
+
+// Source: ./sanity/lib/user/getUserByUsername.ts
+// Variable: getUserByUsernameQuery
+// Query: *[_type == "user" && username == $username][0]
+export type GetUserByUsernameQueryResult = {
+  _id: string;
+  _type: "user";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  username?: string;
+  email?: string;
+  imageUrl?: string;
+  joinedAt?: string;
+  isReported?: boolean;
+} | null;
+
+// Source: ./sanity/lib/user/getUserComments.ts
+// Variable: getUserCommentsQuery
+// Query: *[_type == "comment" && author._ref == $userId] | order(createdAt desc) {        _id,        content,        createdAt,        "author": author->{          _id,          username,          firstName,          lastName        },        "post": post->{          _id,          title,          "subreddit": subreddit->{            _id,            title,            slug          }        }      }
+export type GetUserCommentsQueryResult = Array<{
+  _id: string;
+  content: string | null;
+  createdAt: string | null;
+  author: {
+    _id: string;
+    username: string | null;
+    firstName: null;
+    lastName: null;
+  } | null;
+  post: {
+    _id: string;
+    title: string | null;
+    subreddit: {
+      _id: string;
+      title: string | null;
+      slug: Slug | null;
+    } | null;
+  } | null;
+}>;
+
+// Source: ./sanity/lib/user/getUserPosts.ts
+// Variable: getUserPostsQuery
+// Query: *[_type == "post" && author._ref == $userId && !isDeleted] | order(publishedAt desc) {        _id,        _type,        _createdAt,        _updatedAt,        _rev,        title,        originalTitle,        slug,        body,        helpType,        category,        publishedAt,        isDeleted,        "author": author->{          _id,          _type,          _createdAt,          _updatedAt,          _rev,          username,          firstName,          lastName,          email,          image,          isReported        },        "subreddit": subreddit->{          _id,          _type,          _createdAt,          _updatedAt,          _rev,          title,          slug,          description        },        image,        "upvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "upvote"]),        "downvotes": count(*[_type == "vote" && post._ref == ^._id && voteType == "downvote"]),        "commentCount": count(*[_type == "comment" && post._ref == ^._id])      }
+export type GetUserPostsQueryResult = Array<{
+  _id: string;
+  _type: "post";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  originalTitle: string | null;
+  slug: null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  helpType: "offer" | "request" | null;
+  category: "books" | "childcare" | "deliveries" | "events" | "food" | "grocery" | "health" | "home-garden" | "other" | "pet-care" | "professional" | "repairs" | "tech-support" | "transportation" | "tutoring" | null;
+  publishedAt: string | null;
+  isDeleted: boolean | null;
+  author: {
+    _id: string;
+    _type: "user";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    username: string | null;
+    firstName: null;
+    lastName: null;
+    email: string | null;
+    image: null;
+    isReported: boolean | null;
+  } | null;
+  subreddit: {
+    _id: string;
+    _type: "subreddit";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    title: string | null;
+    slug: Slug | null;
+    description: string | null;
+  } | null;
+  image: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
+  upvotes: number;
+  downvotes: number;
+  commentCount: number;
+}>;
 
 // Source: ./sanity/lib/vote/downvoteComment.ts
 // Variable: existingVoteDownvoteCommentQuery
@@ -937,11 +1042,10 @@ export type GetPostCommentsQueryResult = Array<{
 
 // Source: ./sanity/lib/vote/getPostVotes.ts
 // Variable: getPostVotesQuery
-// Query: {        "upvotes": count(*[_type == "vote" && post._ref == $postId && voteType == "upvote"]),        "downvotes": count(*[_type == "vote" && post._ref == $postId && voteType == "downvote"]),                "netScore": count(*[_type == "vote" && post._ref == $postId && voteType == "upvote"]) - count(*[_type == "vote" && post._ref == $postId && voteType == "downvote"])      }
+// Query: {        "upvotes": count(*[_type == "vote" && post._ref == $postId && voteType == "upvote"]),        "downvotes": count(*[_type == "vote" && post._ref == $postId && voteType == "downvote"])      }
 export type GetPostVotesQueryResult = {
   upvotes: number;
   downvotes: number;
-  netScore: number;
 };
 
 // Source: ./sanity/lib/vote/getUserPostVoteStatus.ts
@@ -1018,18 +1122,21 @@ declare module "@sanity/client" {
     "*[_type == \"comment\" && _id == $commentId][0] {\n    _id,\n    content,\n    createdAt,\n    \"author\": author->,\n    isDeleted\n  }": GetCommentByIdQueryResult;
     "\n      *[_type == \"comment\" && parentComment._ref == $commentId] {\n        ...,\n        _id,\n        content,\n        createdAt,\n        \"author\": author->,\n        \"replies\": *[_type == \"comment\" && parentComment._ref == ^._id],\n        \"votes\": {\n            \"upvotes\": count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"upvote\"]),\n            \"downvotes\": count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"downvote\"]),\n            \"netScore\": count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"upvote\"]) - count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"downvote\"]),\n            \"voteStatus\": *[_type == \"vote\" && comment._ref == ^._id && user._ref == $userId][0].voteType,\n        },\n      } | order(votes.netScore desc) //votes.netScore desc -> if you want to sort by net score\n    ": GetCommentRepliesQueryResult;
     "*[_type == \"post\" && _id == $postId] {\n    _id,\n    title,\n    \"slug\": slug.current,\n    body,\n    publishedAt,\n    \"author\": author->,\n    \"subreddit\": subreddit->,\n    image,\n    isDeleted\n  }[0]": GetPostByIdQueryResult;
-    "*[_type == \"post\" && isDeleted != true] {\n    _id,\n    title,\n    \"slug\": slug.current,\n    body,\n    publishedAt,\n    \"author\": author->,\n    \"subreddit\": subreddit->,\n    image,\n    helpType,\n    category,\n    isDeleted\n  } | order(publishedAt desc)": GetAllPostsQueryResult;
+    "*[_type == \"post\" && isDeleted != true\n  && ($filterType == null || helpType == $filterType)\n  && ($filterCategory == null || category == $filterCategory)\n] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  body,\n  publishedAt,\n  \"author\": author->,\n  \"subreddit\": subreddit->,\n  image,\n  helpType,\n  category,\n  isDeleted\n} | order(publishedAt desc)": GetAllPostsQueryResult;
     "\n        *[_type == \"subreddit\" && title == $name][0] {\n          _id\n        }\n      ": CheckExistingQueryResult;
-    "\n          *[_type == \"subreddit\" && slug.current == $slug][0] {\n            _id\n          }\n        ": CheckSlugQueryResult;
-    "\n      *[_type == \"post\" && subreddit._ref == $id] {\n        ...,\n        \"slug\": slug.current,\n        \"author\": author->,\n        \"subreddit\": subreddit->,\n        \"category\": category->,\n        \"upvotes\": count(*[_type == \"vote\" && post._ref == ^._id && voteType == \"upvote\"]),\n        \"downvotes\": count(*[_type == \"vote\" && post._ref == ^._id && voteType == \"downvote\"]),\n        \"netScore\": count(*[_type == \"vote\" && post._ref == ^._id && voteType == \"upvote\"]) - count(*[_type == \"vote\" && post._ref == ^._id && voteType == \"downvote\"]),\n        \"commentCount\": count(*[_type == \"comment\" && post._ref == ^._id])\n      } | order(publishedAt desc) \n    ": GetPostsForSubredditQueryResult;
+    "\n        *[_type == \"subreddit\" && slug.current == $slug][0] {\n          _id\n        }\n      ": CheckSlugQueryResult;
+    "\n      *[_type == \"post\" && subreddit._ref == $id] {\n        _id,\n        title,\n        \"slug\": slug.current,\n        body,\n        publishedAt,\n        \"author\": author->,\n        \"subreddit\": subreddit->,\n        image,\n        helpType,\n        category,\n        isDeleted\n      } | order(publishedAt desc) \n    ": GetPostsForSubredditQueryResult;
     "*[_type == \"subreddit\" && slug.current == $slug][0] {\n      ...,\n      \"slug\": slug.current,\n      \"moderator\": moderator->,\n    }": GetSubredditBySlugQueryResult;
     "*[_type == \"subreddit\"] {\n        ...,\n        \"slug\": slug.current,\n        \"moderator\": moderator->,\n      } | order(createdAt desc)": GetSubredditsQueryResult;
     "*[_type == \"subreddit\" && title match $searchTerm + \"*\"] {\n    _id,\n    title,\n    \"slug\": slug.current,\n    description,\n    image,\n    \"moderator\": moderator->,\n    createdAt\n  } | order(createdAt desc)": SearchSubredditsQueryResult;
     "*[_type == \"user\" && _id == $id][0]": GetExistingUserQueryResult;
+    "*[_type == \"user\" && username == $username][0]": GetUserByUsernameQueryResult;
+    "*[_type == \"comment\" && author._ref == $userId] | order(createdAt desc) {\n        _id,\n        content,\n        createdAt,\n        \"author\": author->{\n          _id,\n          username,\n          firstName,\n          lastName\n        },\n        \"post\": post->{\n          _id,\n          title,\n          \"subreddit\": subreddit->{\n            _id,\n            title,\n            slug\n          }\n        }\n      }": GetUserCommentsQueryResult;
+    "*[_type == \"post\" && author._ref == $userId && !isDeleted] | order(publishedAt desc) {\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        _rev,\n        title,\n        originalTitle,\n        slug,\n        body,\n        helpType,\n        category,\n        publishedAt,\n        isDeleted,\n        \"author\": author->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          _rev,\n          username,\n          firstName,\n          lastName,\n          email,\n          image,\n          isReported\n        },\n        \"subreddit\": subreddit->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          _rev,\n          title,\n          slug,\n          description\n        },\n        image,\n        \"upvotes\": count(*[_type == \"vote\" && post._ref == ^._id && voteType == \"upvote\"]),\n        \"downvotes\": count(*[_type == \"vote\" && post._ref == ^._id && voteType == \"downvote\"]),\n        \"commentCount\": count(*[_type == \"comment\" && post._ref == ^._id])\n      }": GetUserPostsQueryResult;
     "*[_type == \"vote\" && comment._ref == $commentId && user._ref == $userId][0]": ExistingVoteDownvoteCommentQueryResult | ExistingVoteUpvoteCommentQueryResult;
     "*[_type == \"vote\" && post._ref == $postId && user._ref == $userId][0]": ExistingVoteDownvoteQueryResult | ExistingVoteUpvoteQueryResult;
     "\n    *[_type == \"comment\" && post._ref == $postId && !defined(parentComment)] {\n        ...,\n      _id,\n      content,\n      createdAt,\n      \"author\": author->,\n      \"replies\": *[_type == \"comment\" && parentComment._ref == ^._id],\n      \"votes\": {\n        \"upvotes\": count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"upvote\"]),\n        \"downvotes\": count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"downvote\"]),\n        \"netScore\": count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"upvote\"]) - count(*[_type == \"vote\" && comment._ref == ^._id && voteType == \"downvote\"]),\n        \"voteStatus\": *[_type == \"vote\" && comment._ref == ^._id && user._ref == $userId][0].voteType,\n      },\n    } | order(votes.netScore desc, createdAt desc) // votes.netScore desc -> if you want to sort by net score\n  ": GetPostCommentsQueryResult;
-    "\n      {\n        \"upvotes\": count(*[_type == \"vote\" && post._ref == $postId && voteType == \"upvote\"]),\n\n        \"downvotes\": count(*[_type == \"vote\" && post._ref == $postId && voteType == \"downvote\"]),\n        \n        \"netScore\": count(*[_type == \"vote\" && post._ref == $postId && voteType == \"upvote\"]) - count(*[_type == \"vote\" && post._ref == $postId && voteType == \"downvote\"])\n      }\n    ": GetPostVotesQueryResult;
+    "\n      {\n        \"upvotes\": count(*[_type == \"vote\" && post._ref == $postId && voteType == \"upvote\"]),\n        \"downvotes\": count(*[_type == \"vote\" && post._ref == $postId && voteType == \"downvote\"])\n      }\n    ": GetPostVotesQueryResult;
     "*[_type == \"vote\" && post._ref == $postId && user._ref == $userId][0].voteType": GetUserPostVoteStatusQueryResult;
   }
 }

@@ -1,0 +1,11 @@
+{
+  "path": [
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./sanity/**/*.{ts,tsx}",
+    "./action/**/*.{ts,tsx}"
+  ],
+  "schema": "./schema.json",
+  "generates": "./sanity.types.ts",
+  "overloadClientMethods": true
+}
